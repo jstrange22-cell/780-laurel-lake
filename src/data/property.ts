@@ -167,9 +167,9 @@ export const property: PropertyData = {
     phone: "(865) 204-0343",
     email: "carl@youngmarketinggroup.com",
     website: "https://www.youngmarketinggroup.com",
-    firmLicense: "", // TODO TN TREC firm license number
-    principalBroker: "", // TODO principal broker name
-    principalBrokerLicense: "", // TODO principal broker TN license #
+    firmLicense: "264877",
+    principalBroker: "Dan Green",
+    principalBrokerLicense: "012764",
   },
 
   // === FORM ENDPOINT ===
