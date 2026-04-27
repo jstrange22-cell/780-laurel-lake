@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+/* Explicit content sources — brace expansion isn't supported in @source paths,
+   so list each extension individually. Without this, Tailwind v4's auto-detection
+   misses arbitrary values (h-[100svh]) and responsive variants (lg:col-span-7)
+   in Astro component files. */
+@source "../**/*.astro";
+@source "../**/*.tsx";
+@source "../**/*.ts";
+@source "../**/*.jsx";
+@source "../**/*.js";
+@source "../**/*.html";
+@source "../**/*.md";
+@source "../**/*.mdx";
+
+/* Brute-force safelist for classes our auto-detection has historically missed —
+   keeps the build resilient even if Astro or Tailwind change scanning behavior. */
+@source inline("h-[100svh] min-h-[640px] min-h-[100svh] h-[520px] h-[60vh] min-h-[420px] aspect-[4/5] aspect-video aspect-square");
+@source inline("md:col-span-3 md:col-span-4 md:col-span-5 md:col-span-7 md:col-span-8");
+@source inline("lg:col-span-3 lg:col-span-4 lg:col-span-5 lg:col-span-7 lg:col-span-9");
+@source inline("md:grid-cols-12 lg:grid-cols-12 lg:grid-cols-3 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 md:grid-cols-3");
+@source inline("md:flex md:hidden md:inline-flex md:gap-16 md:gap-12 md:flex-row md:items-center md:grid-cols-2");
+@source inline("sm:py-28 sm:py-32 sm:py-24 sm:pt-9 sm:text-3xl sm:text-4xl sm:text-5xl sm:text-6xl sm:text-7xl sm:gap-4");
+@source inline("md:text-5xl md:text-6xl md:text-[clamp(3.5rem,8vw,8rem)]");
+@source inline("lg:text-xl lg:gap-10 lg:gap-16 lg:flex-row lg:items-center");
+@source inline("border-white/8 border-white/10 border-white/18");
+@source inline("bg-white/[0.02] bg-white/[0.03] bg-white/[0.04] bg-white/5 bg-white/8");
+@source inline("rounded-2xl rounded-xl rounded-lg rounded-full");
+
 @import "@fontsource-variable/fraunces/index.css";
 @import "@fontsource-variable/inter/index.css";
 @import "@fontsource/jetbrains-mono/400.css";
