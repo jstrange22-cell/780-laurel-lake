@@ -1,0 +1,100 @@
+---
+/**
+ * Responsive <picture> element with AVIF + WebP srcsets and a blurhash
+ * background placeholder. Falls back gracefully when the image manifest is
+ * empty (so the dev server can boot before `pnpm assets:images` runs).
+ */
+import type { ManifestImage } from "~/lib/manifest";
+import { decode } from "blurhash";
+
+type Loading = "eager" | "lazy";
+type Fetchpriority = "high" | "low" | "auto";
+
+interface Props {
+  image: ManifestImage | undefined;
+  alt?: string;
+  className?: string;
+  loading?: Loading;
+  fetchpriority?: Fetchpriority;
+  sizes?: string;
+  /** When true, image fills its parent and is positioned absolutely. */
+  fill?: boolean;
+}
+
+const {
+  image,
+  alt,
+  className = "",
+  loading = "lazy",
+  fetchpriority = "auto",
+  sizes,
+  fill = false,
+}: Props = Astro.props;
+
+// Inline blurhash → tiny data URL via blurhash decode at build time
+let placeholder: string | null = null;
+if (image?.blurhash) {
+  try {
+    const w = 32;
+    const h = 32;
+    const pixels = decode(image.blurhash, w, h);
+    const png = await import("sharp").then(({ default: sharp }) =>
+      sharp(Buffer.from(pixels), { raw: { width: w, height: h, channels: 4 } })
+        .webp({ quality: 50 })
+        .toBuffer(),
+    );
+    placeholder = `data:image/webp;base64,${png.toString("base64")}`;
+  } catch {
+    placeholder = null;
+  }
+}
+
+const wrapperStyle = fill
+  ? "position:absolute;inset:0;overflow:hidden;"
+  : "position:relative;overflow:hidden;";
+
+const imgStyle = fill
+  ? "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+  : "width:100%;height:auto;";
+
+const placeholderStyle = placeholder
+  ? `position:absolute;inset:0;background-image:url('${placeholder}');background-size:cover;background-position:center;filter:blur(8px) saturate(1.05);transform:scale(1.05);`
+  : "position:absolute;inset:0;background:#1a1813;";
+---
+
+{
+  image ? (
+    <div class={className} style={wrapperStyle}>
+      <div aria-hidden="true" style={placeholderStyle} />
+      <picture>
+        <source type="image/avif" srcset={image.avifSrcset} sizes={sizes ?? image.sizes} />
+        <source type="image/webp" srcset={image.webpSrcset} sizes={sizes ?? image.sizes} />
+        <img
+          src={image.src}
+          alt={alt ?? image.alt}
+          width={image.width}
+          height={image.height}
+          loading={loading}
+          fetchpriority={fetchpriority}
+          decoding="async"
+          style={imgStyle}
+          onload="this.previousElementSibling && (this.previousElementSibling.style.opacity='0');"
+        />
+      </picture>
+    </div>
+  ) : (
+    <div
+      class={className}
+      style={`${wrapperStyle}background:#1a1813;display:flex;align-items:center;justify-content:center;color:#5e5849;font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;`}
+    >
+      <span>Image pending</span>
+    </div>
+  )
+}
+
+<style>
+  div > div[aria-hidden="true"] {
+    transition: opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+    pointer-events: none;
+  }
+</style>

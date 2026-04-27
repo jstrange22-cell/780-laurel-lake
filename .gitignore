@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+.DS_Store
+.vercel/
+.netlify/
+.cache/
+# Note: public/img/property/ and public/video/ ARE tracked so GitHub Pages
+# can build without needing the original source photos in Downloads/.
+# To regenerate them, run: pnpm run assets

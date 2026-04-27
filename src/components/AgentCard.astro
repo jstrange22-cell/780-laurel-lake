@@ -1,0 +1,73 @@
+---
+import { property } from "~/data/property";
+
+const a = property.agent;
+const hasAgent = Boolean(a.name);
+const telLink = a.phone ? `tel:${a.phone.replace(/\s|\(|\)|-/g, "")}` : "";
+const mailLink = a.email ? `mailto:${a.email}?subject=Inquiry: ${encodeURIComponent(property.address.line1)}` : "";
+---
+
+{
+  hasAgent ? (
+    <section
+      id="agent"
+      class="relative bg-ink-950 py-20 sm:py-28"
+      aria-labelledby="agent-heading"
+    >
+      <div class="container-x">
+        <div class="surface relative overflow-hidden rounded-2xl p-8 sm:p-12">
+          <div class="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-12">
+            <div class="md:col-span-4 lg:col-span-3">
+              <div class="aspect-square w-full max-w-xs overflow-hidden rounded-2xl bg-ink-800">
+                {a.photo ? (
+                  <img
+                    src={a.photo}
+                    alt={`Headshot of ${a.name}`}
+                    width="400"
+                    height="400"
+                    loading="lazy"
+                    decoding="async"
+                    class="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div class="flex h-full w-full items-center justify-center text-ink-500">
+                    <span class="text-stat">Headshot</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div class="md:col-span-8 lg:col-span-9">
+              <p id="agent-heading" class="text-eyebrow mb-3">Listing Agent</p>
+              <h2 class="text-display text-3xl text-ink-50 sm:text-4xl md:text-5xl">{a.name}</h2>
+              {a.title && <p class="mt-1 text-ink-300">{a.title}</p>}
+              {a.brokerage && (
+                <p class="text-stat mt-4 text-gold-300">{a.brokerage}</p>
+              )}
+              {a.bio && <p class="mt-6 max-w-prose text-ink-200">{a.bio}</p>}
+
+              <div class="mt-8 flex flex-wrap items-center gap-3">
+                <a href="#contact" class="btn btn-gold" data-magnetic>
+                  Schedule a Tour
+                </a>
+                {telLink && (
+                  <a href={telLink} class="btn btn-ghost" data-magnetic>
+                    {a.phone}
+                  </a>
+                )}
+                {mailLink && (
+                  <a href={mailLink} class="btn btn-ghost" data-magnetic>
+                    Email
+                  </a>
+                )}
+              </div>
+              {a.licenseNumber && (
+                <p class="text-stat mt-6 text-ink-500">TN License #{a.licenseNumber}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : null
+}

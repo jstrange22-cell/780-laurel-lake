@@ -1,0 +1,92 @@
+---
+import { property, computed } from "~/data/property";
+import { manifest, imagesByIds } from "~/lib/manifest";
+import SmartImage from "~/components/SmartImage.astro";
+
+// Pick the first three drone images as the cross-fade story stack
+const droneIds = manifest.byType.drone.slice(0, 3);
+const droneImages = imagesByIds(droneIds);
+
+// Split description into chunks for staggered reveal. Falls back to a tagline
+// when the user hasn't pasted MLS remarks yet.
+const fallback =
+  "Tucked into a private, gated community on a glass-still 60-acre lake, this Laurel Lake retreat is at home in the rhythm of the Tellico Lake region. Wooded approach, intentional architecture, and a community where the loudest sound on the water is your own paddle.";
+const text = property.description || fallback;
+const paragraphs = text
+  .split(/\n\s*\n/)
+  .map((p) => p.trim())
+  .filter(Boolean);
+---
+
+<section
+  id="story"
+  data-story
+  class="relative bg-ink-950 py-24 sm:py-32 md:py-40"
+>
+  <div class="container-x">
+    <div class="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-16">
+      <!-- Text column -->
+      <div class="md:col-span-7">
+        <p class="text-eyebrow reveal mb-6">A Laurel Lake Property</p>
+        <h2 class="text-display reveal mb-10 text-4xl text-ink-50 sm:text-5xl md:text-6xl">
+          {property.tagline || "Lakeside refuge in private Tennessee."}
+        </h2>
+        <div class="max-w-prose space-y-6 text-pretty text-lg leading-relaxed text-ink-200 sm:text-xl">
+          {paragraphs.map((p) => (
+            <p data-story-line>{p}</p>
+          ))}
+        </div>
+
+        <div class="mt-12 flex flex-wrap gap-x-12 gap-y-6">
+          {property.lotAcres > 0 && (
+            <div class="reveal">
+              <p class="text-eyebrow">Lot</p>
+              <p class="text-display mt-1 text-2xl text-ink-50">
+                {property.lotAcres}
+                <span class="text-stat ml-1 text-ink-400">acres</span>
+              </p>
+            </div>
+          )}
+          {property.yearBuilt > 0 && (
+            <div class="reveal">
+              <p class="text-eyebrow">Year Built</p>
+              <p class="text-display mt-1 text-2xl text-ink-50">{property.yearBuilt}</p>
+            </div>
+          )}
+          {property.mlsNumber && (
+            <div class="reveal">
+              <p class="text-eyebrow">MLS</p>
+              <p class="text-display mt-1 text-2xl text-ink-50">{property.mlsNumber}</p>
+            </div>
+          )}
+          {computed.pricePerSqft() > 0 && (
+            <div class="reveal">
+              <p class="text-eyebrow">$ / SqFt</p>
+              <p class="text-display mt-1 text-2xl text-ink-50">
+                ${computed.pricePerSqft().toLocaleString()}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Cross-fade image stack -->
+      <div class="md:col-span-5">
+        <div class="sticky top-24">
+          <div class="relative aspect-[4/5] w-full overflow-hidden rounded-2xl">
+            {droneImages.length > 0 ? (
+              droneImages.map((img, i) => (
+                <div data-story-image style={`opacity:${i === 0 ? 1 : 0};`} class="absolute inset-0">
+                  <SmartImage image={img} fill loading="lazy" sizes="(min-width:768px) 40vw, 100vw" />
+                </div>
+              ))
+            ) : (
+              <div class="absolute inset-0 bg-ink-800" />
+            )}
+          </div>
+          <p class="text-eyebrow mt-4 text-ink-400">From Above · Hasselblad L2D</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

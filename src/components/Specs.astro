@@ -1,0 +1,154 @@
+---
+import { property, computed } from "~/data/property";
+
+interface Block {
+  label: string;
+  rows: { k: string; v: string | number | undefined }[];
+}
+
+const fmtPrice = property.price > 0 ? computed.formattedPrice() : "";
+const fmtTax = property.annualTax > 0 ? `$${property.annualTax.toLocaleString()}/yr` : "";
+const fmtHoa =
+  property.hoaDues.amount > 0 && property.hoaDues.period
+    ? `$${property.hoaDues.amount.toLocaleString()}/${property.hoaDues.period === "monthly" ? "mo" : "yr"}`
+    : "";
+
+const blocks: Block[] = [
+  {
+    label: "Overview",
+    rows: [
+      { k: "Address", v: computed.fullAddress() },
+      { k: "County", v: property.address.county },
+      { k: "Subdivision", v: property.address.subdivision },
+      { k: "Property Type", v: property.propertyType },
+      { k: "MLS #", v: property.mlsNumber || undefined },
+      { k: "Status", v: property.status },
+      { k: "Year Built", v: property.yearBuilt > 0 ? property.yearBuilt : undefined },
+    ],
+  },
+  {
+    label: "Size",
+    rows: [
+      { k: "Bedrooms", v: property.beds > 0 ? property.beds : undefined },
+      {
+        k: "Bathrooms",
+        v:
+          property.baths.full > 0 || property.baths.half > 0
+            ? `${property.baths.full} full · ${property.baths.half} half`
+            : undefined,
+      },
+      {
+        k: "Heated SqFt",
+        v: property.sqft.heated > 0 ? property.sqft.heated.toLocaleString() : undefined,
+      },
+      {
+        k: "Total SqFt",
+        v: property.sqft.total ? property.sqft.total.toLocaleString() : undefined,
+      },
+      { k: "Lot Size", v: property.lotAcres > 0 ? `${property.lotAcres} acres` : undefined },
+    ],
+  },
+  {
+    label: "Financial",
+    rows: [
+      { k: "List Price", v: fmtPrice || undefined },
+      {
+        k: "Price / SqFt",
+        v: computed.pricePerSqft() > 0 ? `$${computed.pricePerSqft()}` : undefined,
+      },
+      { k: "Annual Tax", v: fmtTax || undefined },
+      { k: "HOA Dues", v: fmtHoa || undefined },
+      { k: "School District", v: property.schoolDistrict || undefined },
+    ],
+  },
+];
+
+const featureBlocks = [
+  { label: "Interior", items: property.features.interior },
+  { label: "Exterior", items: property.features.exterior },
+  { label: "Appliances", items: property.features.appliances },
+  { label: "Flooring", items: property.features.flooring },
+  { label: "Heating", items: property.features.heating },
+  { label: "Cooling", items: property.features.cooling },
+  { label: "Parking", items: property.features.parking },
+  { label: "View", items: property.features.view },
+].filter((b) => b.items.length > 0);
+
+const hasFireplace = property.features.fireplace.length > 0;
+const hasWaterfront = property.features.waterfront.length > 0;
+---
+
+<section
+  id="specs"
+  class="relative bg-ink-950 py-20 sm:py-28"
+  aria-labelledby="specs-heading"
+>
+  <div class="container-x">
+    <div class="mb-10 max-w-2xl">
+      <p class="text-eyebrow reveal mb-4">The Details</p>
+      <h2 id="specs-heading" class="text-display reveal text-4xl text-ink-50 sm:text-5xl">
+        Every spec, on the record.
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+      {
+        blocks.map((b) => (
+          <div class="reveal">
+            <p class="text-eyebrow mb-5">{b.label}</p>
+            <dl class="space-y-3">
+              {b.rows
+                .filter((r) => r.v !== undefined && r.v !== "" && r.v !== 0)
+                .map((r) => (
+                  <div class="flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                    <dt class="text-stat text-ink-400">{r.k}</dt>
+                    <dd class="text-right text-ink-100">{String(r.v)}</dd>
+                  </div>
+                ))}
+              {b.rows.every((r) => !r.v || r.v === 0) && (
+                <p class="text-sm text-ink-500 italic">
+                  Awaiting MLS data
+                </p>
+              )}
+            </dl>
+          </div>
+        ))
+      }
+    </div>
+
+    {
+      (featureBlocks.length > 0 || hasFireplace || hasWaterfront) && (
+        <div class="mt-16">
+          <p class="text-eyebrow reveal mb-6">Features & Finishes</p>
+          <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {featureBlocks.map((b) => (
+              <div class="reveal">
+                <p class="text-stat mb-3 text-gold-300">{b.label}</p>
+                <ul class="space-y-1.5 text-sm text-ink-200">
+                  {b.items.map((it) => (
+                    <li class="flex items-start gap-2">
+                      <span class="mt-2 inline-block h-1 w-1 flex-none rounded-full bg-gold-400" aria-hidden="true" />
+                      {it}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+            {hasFireplace && (
+              <div class="reveal">
+                <p class="text-stat mb-3 text-gold-300">Fireplace</p>
+                <p class="text-sm text-ink-200">{property.features.fireplace}</p>
+              </div>
+            )}
+            {hasWaterfront && (
+              <div class="reveal">
+                <p class="text-stat mb-3 text-gold-300">Waterfront</p>
+                <p class="text-sm text-ink-200">{property.features.waterfront}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>

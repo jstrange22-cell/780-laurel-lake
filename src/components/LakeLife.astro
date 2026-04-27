@@ -1,0 +1,61 @@
+---
+import { lakeFacts } from "~/data/nearby";
+import { manifest, imagesByIds } from "~/lib/manifest";
+import SmartImage from "~/components/SmartImage.astro";
+
+// Two cinematic aerials of the lake/water for this section
+const lakeImages = imagesByIds([67, 70]).length === 2
+  ? imagesByIds([67, 70])
+  : manifest.byType.drone.slice(2, 4).map((id) => manifest.images.find((i) => i.id === id)!).filter(Boolean);
+---
+
+<section
+  id="lake"
+  class="relative overflow-hidden bg-gradient-to-b from-ink-950 via-ink-900 to-ink-950 py-24 sm:py-32"
+  aria-labelledby="lake-heading"
+>
+  <div class="container-x">
+    <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+      <div class="lg:col-span-5">
+        <p class="text-eyebrow reveal mb-4">Life on the Water</p>
+        <h2 id="lake-heading" class="text-display reveal text-4xl text-ink-50 sm:text-5xl md:text-6xl">
+          A lake of your own —<br/>
+          <span class="text-gold-300">{lakeFacts.acres} acres,</span><br/>
+          electric only.
+        </h2>
+        <p class="reveal mt-6 max-w-prose text-pretty text-lg text-ink-200">
+          {lakeFacts.description}
+        </p>
+
+        <ul class="mt-8 grid grid-cols-2 gap-3">
+          {lakeFacts.activities.map((a) => (
+            <li class="surface reveal text-stat flex items-center gap-2 rounded-full px-4 py-2 text-ink-100">
+              <span class="h-1.5 w-1.5 rounded-full bg-gold-300" aria-hidden="true"></span>
+              {a}
+            </li>
+          ))}
+        </ul>
+
+        <div class="reveal mt-10 flex items-center gap-3 text-ink-300">
+          <span class="text-stat">Motor policy</span>
+          <span class="hairline h-px flex-1"></span>
+          <span class="text-stat text-gold-200">{lakeFacts.motorPolicy}</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="relative grid grid-cols-2 gap-3">
+          {
+            lakeImages.map((img, i) => (
+              <div
+                class={`relative overflow-hidden rounded-xl ${i === 0 ? "col-span-2 aspect-video" : "aspect-[4/5]"}`}
+              >
+                <SmartImage image={img} fill loading="lazy" sizes="(min-width:1024px) 50vw, 100vw" />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://780laurellake.com/sitemap.xml

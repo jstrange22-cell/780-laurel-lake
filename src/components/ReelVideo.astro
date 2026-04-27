@@ -1,0 +1,83 @@
+---
+import { manifest, path } from "~/lib/manifest";
+import SmartImage from "~/components/SmartImage.astro";
+
+// Use a different aerial as the reel poster fallback if the ffmpeg poster is missing
+const posterImage = manifest.images.find((i) => i.id === 64) ?? manifest.images[0];
+const posterUrl = path("/video/reel-poster.jpg");
+const reelMp4 = path("/video/reel.mp4");
+---
+
+<section
+  id="reel"
+  class="relative overflow-hidden bg-ink-950 py-20 sm:py-28"
+  aria-labelledby="reel-heading"
+>
+  <div class="container-x">
+    <div class="mb-10 max-w-2xl">
+      <p class="text-eyebrow reveal mb-4">Property Film</p>
+      <h2 id="reel-heading" class="text-display reveal text-4xl text-ink-50 sm:text-5xl">
+        Watch the reel.
+      </h2>
+      <p class="reveal mt-4 text-ink-300">
+        Two minutes of cinematography. Headphones recommended.
+      </p>
+    </div>
+
+    <div class="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/8 bg-ink-900">
+      <!-- AVIF poster behind everything; ffmpeg-generated poster on top if available -->
+      <SmartImage image={posterImage} fill loading="lazy" sizes="100vw" />
+      <img
+        src={posterUrl}
+        alt=""
+        class="absolute inset-0 h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+        onerror="this.style.display='none'"
+      />
+
+      <video
+        data-reel-video
+        class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500"
+        controls
+        preload="metadata"
+        playsinline
+        poster={posterUrl}
+      >
+        <source src={reelMp4} type="video/mp4" />
+      </video>
+
+      <button
+        type="button"
+        data-reel-play
+        class="absolute inset-0 flex items-center justify-center bg-ink-950/30 transition-opacity duration-300 hover:bg-ink-950/20 focus-visible:outline-none"
+        aria-label="Play property reel"
+      >
+        <span class="surface flex items-center gap-3 px-6 py-4">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <path d="M6 4.5l12 6.5-12 6.5V4.5Z" fill="var(--color-gold-300)" />
+          </svg>
+          <span class="text-stat text-ink-50">Play Reel</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btn = document.querySelector("[data-reel-play]");
+    const v = document.querySelector("[data-reel-video]");
+    if (!(btn instanceof HTMLElement) || !(v instanceof HTMLVideoElement)) return;
+    btn.addEventListener("click", () => {
+      v.style.opacity = "1";
+      btn.style.opacity = "0";
+      btn.style.pointerEvents = "none";
+      v.play();
+    });
+    v.addEventListener("ended", () => {
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    });
+  });
+</script>

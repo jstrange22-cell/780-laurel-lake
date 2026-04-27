@@ -1,0 +1,55 @@
+---
+import { property, computed } from "~/data/property";
+
+const a = property.address;
+const showPrice = property.price > 0;
+---
+
+<div
+  data-sticky-stats
+  class="pointer-events-none fixed top-0 left-0 z-40 w-full -translate-y-full opacity-0 transition-[opacity,transform] duration-500"
+>
+  <div class="border-b border-white/8 bg-ink-950/80 backdrop-blur-md">
+    <div class="container-x flex h-14 items-center justify-between gap-6">
+      <div class="min-w-0 truncate">
+        <p class="text-eyebrow text-ink-300 truncate">{a.line1}</p>
+      </div>
+      <div class="flex items-center gap-5 sm:gap-7">
+        {showPrice && (
+          <span class="hidden text-stat text-gold-200 sm:inline">
+            {computed.formattedPrice()}
+          </span>
+        )}
+        {property.beds > 0 && (
+          <span class="text-stat text-ink-100">
+            <span class="text-ink-400">B</span>
+            {" "}{property.beds}
+          </span>
+        )}
+        {(property.baths.full > 0 || property.baths.half > 0) && (
+          <span class="text-stat text-ink-100">
+            <span class="text-ink-400">Ba</span>
+            {" "}{computed.bathSummary()}
+          </span>
+        )}
+        {property.sqft.heated > 0 && (
+          <span class="hidden text-stat text-ink-100 md:inline">
+            <span class="text-ink-400">SqFt</span>
+            {" "}{computed.formattedSqft()}
+          </span>
+        )}
+        <a href="#contact" class="btn btn-gold pointer-events-auto !py-2 !px-4 text-[0.65rem]">
+          Tour
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  [data-sticky-stats].is-pinned {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>

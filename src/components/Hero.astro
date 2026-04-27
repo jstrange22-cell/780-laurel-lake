@@ -1,0 +1,167 @@
+---
+import { property, computed } from "~/data/property";
+import { heroImage, path } from "~/lib/manifest";
+import SmartImage from "~/components/SmartImage.astro";
+
+const a = property.address;
+const hero = heroImage();
+const showPrice = property.price > 0;
+const showStats = property.beds > 0 || property.baths.full > 0 || property.sqft.heated > 0;
+const heroPoster = path("/img/property/prop-001-1920.webp");
+const heroLoopMp4 = path("/video/hero-loop.mp4");
+---
+
+<header data-hero class="relative h-[100svh] min-h-[640px] w-full overflow-hidden bg-ink-950">
+  <!-- Background: video first, AVIF fallback under it -->
+  <div data-hero-media class="absolute inset-0">
+    <SmartImage
+      image={hero}
+      alt={`Aerial view of ${a.line1}`}
+      fill
+      loading="eager"
+      fetchpriority="high"
+      sizes="100vw"
+      className="absolute inset-0"
+    />
+    <video
+      class="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster={heroPoster}
+      data-hero-video
+    >
+      <source src={heroLoopMp4} type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Top gradient + bottom gradient for legibility -->
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="background:
+      linear-gradient(180deg, rgba(6,5,3,0.55) 0%, rgba(6,5,3,0) 22%, rgba(6,5,3,0) 60%, rgba(6,5,3,0.85) 100%);"
+  >
+  </div>
+  <div class="bg-noise pointer-events-none absolute inset-0 opacity-40"></div>
+
+  <!-- Top nav -->
+  <div class="relative z-10">
+    <nav class="container-x flex items-center justify-between pt-7 sm:pt-9">
+      <a href="#top" class="text-eyebrow text-ink-100">Laurel Lake · TN</a>
+      <ul class="hidden gap-7 md:flex">
+        <li><a href="#story" class="text-eyebrow text-ink-200 hover:text-gold-200">The Home</a></li>
+        <li><a href="#gallery" class="text-eyebrow text-ink-200 hover:text-gold-200">Gallery</a></li>
+        <li><a href="#lake" class="text-eyebrow text-ink-200 hover:text-gold-200">Lake</a></li>
+        <li><a href="#location" class="text-eyebrow text-ink-200 hover:text-gold-200">Location</a></li>
+        <li><a href="#specs" class="text-eyebrow text-ink-200 hover:text-gold-200">Specs</a></li>
+      </ul>
+      <a href="#contact" class="btn btn-ghost hidden md:inline-flex" data-magnetic>
+        Schedule Tour
+      </a>
+    </nav>
+  </div>
+
+  <!-- Hero content -->
+  <div class="container-x relative z-10 flex h-full flex-col justify-end pb-16 sm:pb-24">
+    <p class="text-eyebrow mb-4">
+      {a.subdivision} · {a.city}, {a.state}
+    </p>
+    <h1
+      class="text-display max-w-5xl text-5xl leading-[0.95] text-ink-50 sm:text-7xl md:text-[clamp(3.5rem,8vw,8rem)]"
+    >
+      {a.line1}
+    </h1>
+    <p class="mt-5 max-w-xl text-pretty text-base text-ink-200 sm:text-lg">{property.tagline}</p>
+
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <a href="#story" class="btn btn-gold" data-magnetic>
+        View the Property
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      {property.virtualTourUrl && (
+        <a
+          href={property.virtualTourUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn btn-ghost"
+          data-magnetic
+        >
+          3D Tour
+        </a>
+      )}
+    </div>
+
+    <!-- Quick stats -->
+    {
+      (showPrice || showStats) && (
+        <div class="mt-10 flex flex-wrap items-end gap-x-10 gap-y-4">
+          {showPrice && (
+            <div>
+              <span class="text-eyebrow block">List Price</span>
+              <span class="text-display mt-1 block text-2xl text-gold-200 sm:text-3xl">
+                {computed.formattedPrice()}
+              </span>
+            </div>
+          )}
+          {property.beds > 0 && (
+            <div>
+              <span class="text-eyebrow block">Bedrooms</span>
+              <span class="text-display mt-1 block text-2xl text-ink-50 sm:text-3xl">{property.beds}</span>
+            </div>
+          )}
+          {(property.baths.full > 0 || property.baths.half > 0) && (
+            <div>
+              <span class="text-eyebrow block">Bathrooms</span>
+              <span class="text-display mt-1 block text-2xl text-ink-50 sm:text-3xl">
+                {computed.bathSummary()}
+              </span>
+            </div>
+          )}
+          {property.sqft.heated > 0 && (
+            <div>
+              <span class="text-eyebrow block">Heated Sq Ft</span>
+              <span class="text-display mt-1 block text-2xl text-ink-50 sm:text-3xl">
+                {computed.formattedSqft()}
+              </span>
+            </div>
+          )}
+          {property.lotAcres > 0 && (
+            <div>
+              <span class="text-eyebrow block">Acres</span>
+              <span class="text-display mt-1 block text-2xl text-ink-50 sm:text-3xl">
+                {property.lotAcres}
+              </span>
+            </div>
+          )}
+        </div>
+      )
+    }
+  </div>
+
+  <!-- Scroll cue -->
+  <div class="absolute bottom-6 left-1/2 z-10 -translate-x-1/2">
+    <div class="flex flex-col items-center gap-3">
+      <span class="text-stat text-ink-300">Scroll</span>
+      <div class="scroll-cue"></div>
+    </div>
+  </div>
+</header>
+
+<script is:inline>
+  // Try to play hero video; if it fails (data-saver, codec, autoplay block), keep the AVIF
+  document.addEventListener("DOMContentLoaded", () => {
+    const v = document.querySelector("[data-hero-video]");
+    if (!(v instanceof HTMLVideoElement)) return;
+    const onCanPlay = () => {
+      v.style.opacity = "1";
+    };
+    v.addEventListener("loadeddata", onCanPlay, { once: true });
+    v.play().catch(() => {
+      // autoplay blocked — silently keep the AVIF visible
+    });
+  });
+</script>
