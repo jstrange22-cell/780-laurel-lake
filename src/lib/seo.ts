@@ -74,16 +74,37 @@ export function buildJsonLd(canonicalUrl: string, heroImageUrl: string) {
 
   realEstateListing.itemOffered = sd;
 
+  // Brokerage organization (always emit — required for compliance + Google rich results)
+  const b = property.brokerage;
+  const brokerageOrg: Record<string, unknown> = {
+    "@type": "RealEstateAgent",
+    name: b.name,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: `${b.address.line1}${b.address.line2 ? `, ${b.address.line2}` : ""}`,
+      addressLocality: b.address.city,
+      addressRegion: b.address.state,
+      postalCode: b.address.zip,
+      addressCountry: "US",
+    },
+  };
+  if (b.parent) brokerageOrg.parentOrganization = { "@type": "Organization", name: b.parent };
+  if (b.phone) brokerageOrg.telephone = b.phone;
+  if (b.email) brokerageOrg.email = b.email;
+  if (b.website) brokerageOrg.url = b.website;
+  realEstateListing.broker = brokerageOrg;
+
+  // Listing agent (if filled in) — separate node
   if (property.agent.name) {
     const agent: Record<string, unknown> = {
       "@type": "RealEstateAgent",
       name: property.agent.name,
+      worksFor: { "@type": "Organization", name: b.name },
     };
-    if (property.agent.brokerage) agent.worksFor = { "@type": "Organization", name: property.agent.brokerage };
     if (property.agent.phone) agent.telephone = property.agent.phone;
     if (property.agent.email) agent.email = property.agent.email;
     if (property.agent.photo) agent.image = property.agent.photo;
-    realEstateListing.broker = agent;
+    realEstateListing.agent = agent;
   }
 
   return realEstateListing;

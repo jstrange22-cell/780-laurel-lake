@@ -76,45 +76,59 @@ const featureBlocks = [
 
 const hasFireplace = property.features.fireplace.length > 0;
 const hasWaterfront = property.features.waterfront.length > 0;
+
+// Filter to only blocks that actually have populated rows — no empty IDX placeholders.
+const populatedBlocks = blocks
+  .map((b) => ({
+    label: b.label,
+    rows: b.rows.filter((r) => r.v !== undefined && r.v !== "" && r.v !== 0),
+  }))
+  .filter((b) => b.rows.length > 0);
+
+const hasFeatures = featureBlocks.length > 0 || hasFireplace || hasWaterfront;
+const showSection = populatedBlocks.length > 0 || hasFeatures;
+
+// Choose grid column class based on how many blocks we'll render.
+const gridCols =
+  populatedBlocks.length === 1
+    ? "lg:grid-cols-1"
+    : populatedBlocks.length === 2
+      ? "lg:grid-cols-2"
+      : "lg:grid-cols-3";
 ---
 
-<section
-  id="specs"
-  class="relative bg-ink-950 py-20 sm:py-28"
-  aria-labelledby="specs-heading"
->
-  <div class="container-x">
-    <div class="mb-10 max-w-2xl">
-      <p class="text-eyebrow reveal mb-4">The Details</p>
-      <h2 id="specs-heading" class="text-display reveal text-4xl text-ink-50 sm:text-5xl">
-        Every spec, on the record.
-      </h2>
-    </div>
+{
+  showSection && (
+    <section
+      id="specs"
+      class="relative bg-ink-950 py-20 sm:py-28"
+      aria-labelledby="specs-heading"
+    >
+      <div class="container-x">
+        <div class="mb-10 max-w-2xl">
+          <p class="text-eyebrow reveal mb-4">The Details</p>
+          <h2 id="specs-heading" class="text-display reveal text-4xl text-ink-50 sm:text-5xl">
+            Every spec, on the record.
+          </h2>
+        </div>
 
-    <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
-      {
-        blocks.map((b) => (
-          <div class="reveal">
-            <p class="text-eyebrow mb-5">{b.label}</p>
-            <dl class="space-y-3">
-              {b.rows
-                .filter((r) => r.v !== undefined && r.v !== "" && r.v !== 0)
-                .map((r) => (
-                  <div class="flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-                    <dt class="text-stat text-ink-400">{r.k}</dt>
-                    <dd class="text-right text-ink-100">{String(r.v)}</dd>
-                  </div>
-                ))}
-              {b.rows.every((r) => !r.v || r.v === 0) && (
-                <p class="text-sm text-ink-500 italic">
-                  Awaiting MLS data
-                </p>
-              )}
-            </dl>
+        {populatedBlocks.length > 0 && (
+          <div class={`grid grid-cols-1 gap-10 ${gridCols}`}>
+            {populatedBlocks.map((b) => (
+              <div class="reveal">
+                <p class="text-eyebrow mb-5">{b.label}</p>
+                <dl class="space-y-3">
+                  {b.rows.map((r) => (
+                    <div class="flex items-baseline justify-between gap-4 border-b border-white/5 pb-3 last:border-0 last:pb-0">
+                      <dt class="text-stat text-ink-400">{r.k}</dt>
+                      <dd class="text-right text-ink-100">{String(r.v)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
           </div>
-        ))
-      }
-    </div>
+        )}
 
     {
       (featureBlocks.length > 0 || hasFireplace || hasWaterfront) && (
@@ -150,5 +164,7 @@ const hasWaterfront = property.features.waterfront.length > 0;
         </div>
       )
     }
-  </div>
-</section>
+      </div>
+    </section>
+  )
+}

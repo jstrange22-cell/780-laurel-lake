@@ -62,6 +62,19 @@ export interface PropertyData {
     licenseNumber: string;
     bio: string;
   };
+  /** Brokerage / firm details — required for RESPA, TREC, and Fair Housing compliance. */
+  brokerage: {
+    name: string;
+    parent: string;
+    address: { line1: string; line2: string; city: string; state: string; zip: string };
+    phone: string;
+    email: string;
+    website: string;
+    /** Tennessee Real Estate Commission firm license #. */
+    firmLicense: string;
+    principalBroker: string;
+    principalBrokerLicense: string;
+  };
   /** Where the contact form POSTs JSON. Empty = console.log only (dev). */
   contactWebhookUrl: string;
   /** Brand line shown in footer. */
@@ -131,7 +144,7 @@ export const property: PropertyData = {
   agent: {
     name: "", // TODO
     title: "", // TODO e.g. "Listing Agent" or "Broker"
-    brokerage: "", // TODO
+    brokerage: "Young Marketing Group · Realty Executives",
     photo: "", // TODO place headshot in public/agent/headshot.jpg, then set "/agent/headshot.jpg"
     phone: "", // TODO e.g. "+1 (865) 555-0123"
     email: "", // TODO
@@ -139,13 +152,33 @@ export const property: PropertyData = {
     bio: "", // TODO 1-2 sentence agent bio
   },
 
+  // === BROKERAGE / FIRM ===
+  // Verified from public sources. Firm license # to be filled in by the office.
+  brokerage: {
+    name: "Young Marketing Group",
+    parent: "Realty Executives Associates",
+    address: {
+      line1: "410 Montbrook Lane",
+      line2: "Suite 103",
+      city: "Knoxville",
+      state: "TN",
+      zip: "37919",
+    },
+    phone: "(865) 204-0343",
+    email: "carl@youngmarketinggroup.com",
+    website: "https://www.youngmarketinggroup.com",
+    firmLicense: "", // TODO TN TREC firm license number
+    principalBroker: "", // TODO principal broker name
+    principalBrokerLicense: "", // TODO principal broker TN license #
+  },
+
   // === FORM ENDPOINT ===
   contactWebhookUrl: "", // TODO POST URL for inquiries (Zapier/n8n/Formspree). Empty = console.log
 
   // === BRAND LINES ===
-  brokerageLine: "", // TODO e.g. "Presented by [Brokerage Name]"
+  brokerageLine: "Presented by Young Marketing Group · Realty Executives",
   disclaimers:
-    "All information deemed reliable but not guaranteed. Buyer to verify all measurements and details. Equal Housing Opportunity.",
+    "All information herein is deemed reliable but not guaranteed by Young Marketing Group, Realty Executives Associates, or any of their respective members. Buyer and buyer's agent to independently verify all property details, measurements, schools, taxes, HOA, and zoning. Listing data sourced from the Multiple Listing Service. Each office is independently owned and operated. Equal Housing Opportunity.",
 };
 
 /** Convenience computed values */

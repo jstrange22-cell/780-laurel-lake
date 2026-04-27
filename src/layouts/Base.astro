@@ -57,11 +57,13 @@ const jsonld = buildJsonLd(canonical, ogImageUrl);
     <meta name="geo.position" content={`${property.address.lat};${property.address.lng}`} />
     <meta name="ICBM" content={`${property.address.lat}, ${property.address.lng}`} />
 
-    <!-- Performance hints -->
+    <!-- Performance hints — preload the hero aerial -->
     <link
       rel="preload"
       as="image"
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/img/property/prop-001-1920.avif`}
+      imagesrcset={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/img/property/prop-001-640.avif 640w, ${import.meta.env.BASE_URL.replace(/\/$/, "")}/img/property/prop-001-1280.avif 1280w, ${import.meta.env.BASE_URL.replace(/\/$/, "")}/img/property/prop-001-1920.avif 1920w`}
+      imagesizes="100vw"
       type="image/avif"
     />
   </head>
