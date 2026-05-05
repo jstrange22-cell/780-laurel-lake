@@ -164,7 +164,7 @@ export const property: PropertyData = {
       state: "TN",
       zip: "37919",
     },
-    phone: "(865) 204-0343",
+    phone: "(865) 281-1321",
     email: "carl@youngmarketinggroup.com",
     website: "https://www.youngmarketinggroup.com",
     firmLicense: "264877",

@@ -197,12 +197,15 @@ const mapData = JSON.stringify({ center, pois: nearby });
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
+    // CartoDB "Dark Matter" basemap — free, no API key required, no domain
+    // registration. (Stadia required key registration for non-localhost origins.)
     L.tileLayer(
-      "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
         maxZoom: 20,
+        subdomains: "abcd",
         attribution:
-          '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       },
     ).addTo(map);
 
